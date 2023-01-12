@@ -1,60 +1,50 @@
-class Donation
+class Donation < ActiveRecord::Base
 
-    attr_accessor :amount, :date, :organization_id 
-    attr_reader :id
+# # CRUD ; create, updated, read, delete records from the database 
 
-    def initialize(attributes) 
-        attributes.each do |key, value|
-            if self.respond_to?("#{key.to_s}=") 
-                self.send("#{key.to_s}=", value) 
-            end 
-        end
+# # CREATE A DONATION RECORD IN THE DB 
 
-    end
+# # .new => instantiate a new instance, won't save to the database 
+# # we need to follow it up with .save 
 
-    def save 
-        if self.id
-            self.update
-        else 
-            sql = <<-SQL
-                INSERT INTO donations (amount, date, organization_id) VALUES (?, ?, ?);
-            SQL
+# # .create => gives both .new + .save all in one method 
 
-            DB.execute(sql, self.amount, self.date, self.organization_id)
-            @id = DB.last_insert_row_id
-        end 
-        self  
-    end
+# # READ 
 
-    def update 
-        sql = <<-SQL
-           UPDATE donations SET amount = ?, date = ?, organization_id = ? WHERE id = ?
-        SQL
+# # .all => query the entire table and return all of the records as an array 
 
-        DB.execute(sql, self.amount, self.date, self.organization_id, self.id)
-        self
-    end
+# # .find(id)
+# Donation.find(1)
 
-    def self.all 
-        array_of_hashes = DB.execute("SELECT * FROM donations")
-        array_of_hashes.map do |hash|
-            binding.pry
-          self.new(hash)
-        end
-    end
+# # .find_by(attr: value)
+# Donation.find_by(amount: 500)
 
-    def self.create_table 
-        sql = <<-SQL
-        CREATE TABLE IF NOT EXISTS donations (
-            id INTEGER PRIMARY KEY, 
-            amount INTEGER,
-            date INTEGER,
-            organization_id INTEGER
-        );
-        SQL
-        DB.execute(sql)
-    end 
+# #.find_by_attr(value)
+# Donation.find_by_amount(500)
 
 
+# # .where => analogous to select, it could return more than 1 result 
+
+# # UPDATE 
+
+# # identify and retrieve the record I need to update 
+# donation = Donation.find_by_amount(500)
+
+# # use the .update method to change an attribute => this does persist the change to the db 
+# donation.update(amount: 200)
+
+
+# # DELETE
+
+# # find the record first 
+# donation = Donation.find(1)
+
+# # .destroy which will delete teh record from the db, no you cant undo it
+# donation.destroy 
 end 
 
+donations = Donation.where(date: "011223")
+
+donations.each do |donation|
+    donation.update(pending: true)
+end
